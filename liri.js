@@ -1,6 +1,7 @@
 var Twitter = require('twitter');
 var Spotify = require('node-spotify-api');
 var request = require("request");
+var fs = require("fs");
 
 var keys = require('./keys.js');
 var twitterKeys = keys.twitter;
@@ -9,7 +10,7 @@ var spotifyKeys = keys.spotify;
 //methods 
 
 
-//my-tweets: shows last 20 tweets
+//my-tweets
 
 function loadTweets() {
 
@@ -42,9 +43,13 @@ function spotifySong() {
      
     //setup
     var spotify = new Spotify(keys.spotify);
+    var songSearch = process.argv[3];
+    if(!songSearch){
+        songSearch = "Hello";
+    }
 
     //retreive info
-    spotify.search({ type: 'track', query: 'Hello' }, function(err, data) {
+    spotify.search({ type: 'track', query: songSearch }, function(err, data) {
         if (err) {
           return console.log('Error occurred: ' + err);
         }
@@ -69,7 +74,12 @@ spotifySong();
 
 function movieInfo() {
 
-    var queryUrl = "http://www.omdbapi.com/?t=remember+the+titans&y=&plot=short&apikey=trilogy";
+    var movieSearch = process.argv[4];
+    if(!movieSearch){
+        movieSearch = "Mr Nobody";
+    }
+
+    var queryUrl = "http://www.omdbapi.com/?t=" + movieSearch + "&y=&plot=short&apikey=trilogy";
 
 	request(queryUrl, function(error, response, body) {
 	  
@@ -94,6 +104,36 @@ function movieInfo() {
 movieInfo();
 
 
+//do-what-it-says
 
 
+function doWhatItSays() {
+    fs.readFile('random.txt', 'utf8', function(error, data) {
+        if (!error) {
+            var dataArr = data.split(',');
+            if (dataArr[0] === 'spotify-this-song') {
+                spotifySong(dataArr[1]);
+            }
+            if (dataArr[0] === 'movie-this') {
+                movieInfo(dataArr[1]);
+            }
+            if (dataArr[0] === 'my-tweets') {
+                loadTweets(dataArr[1]);
+            }
+        }
+        else {
+            console.log("there was an error");
+        }
+    });
+}
+doWhatItSays();
+
+function log(logResults) {
+    fs.appendFile("log.txt", logResults, (error) => {
+        if (error) {
+            throw error;
+        }
+    });
+}
+log();
 
