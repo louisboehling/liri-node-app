@@ -1,11 +1,23 @@
 var Twitter = require('twitter');
 var Spotify = require('node-spotify-api');
-var request = require("request");
-var fs = require("fs");
+var request = require('request');
+var fs = require('fs');
+var liriCommand = process.argv[2];
 
 var keys = require('./keys.js');
 var twitterKeys = keys.twitter;
 var spotifyKeys = keys.spotify;
+
+
+// switch cases
+
+switch (liriCommand) {
+    case "my-tweets": loadTweets(); break;
+    case "spotify-this-song": spotifySong(); break;
+    case "movie-this": movieInfo(); break;
+    case "do-what-it-says": doWhatItSays(); break;
+};
+
 
 //methods 
 
@@ -34,7 +46,6 @@ function loadTweets() {
         }
       });
 }
-loadTweets();
 
 
 //spotify-this-song
@@ -67,14 +78,13 @@ function spotifySong() {
         ); 
       });
 }
-spotifySong();
 
 
 //movie-this
 
 function movieInfo() {
 
-    var movieSearch = process.argv[4];
+    var movieSearch = process.argv[3];
     if(!movieSearch){
         movieSearch = "Mr Nobody";
     }
@@ -101,7 +111,6 @@ function movieInfo() {
 	  }
 	});
 }
-movieInfo();
 
 
 //do-what-it-says
@@ -126,14 +135,3 @@ function doWhatItSays() {
         }
     });
 }
-doWhatItSays();
-
-function log(logResults) {
-    fs.appendFile("log.txt", logResults, (error) => {
-        if (error) {
-            throw error;
-        }
-    });
-}
-log();
-
